@@ -1,40 +1,16 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Asymmetry Calculator</title>
-    <!-- Stable WebAssembly application styles -->
-    <link rel="stylesheet" href="https://jsdelivr.net" />
-  </head>
-  <body>
-    <!-- Main container where the app mounts -->
-    <div id="root"></div>
-
-    <script type="module">
-      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.js";
-
-      mount({
-        requirements: ["numpy"],
-        entrypoint: "app.py",
-        files: {
-          "app.py": `
 import streamlit as st
 import numpy as np
 
-# Page configuration
 st.set_page_config(page_title="Asymmetry Uncertainty Calculator", page_icon="📊")
 
 st.title("📊 Asymmetry Uncertainty & Time Calculator")
-st.markdown("This app calculates statistical metrics for the rate asymmetry: $A = \\\\frac{N_1 - N_2}{N_1 + N_2}$")
+st.markdown("This app calculates statistical metrics for the rate asymmetry: $A = \\frac{N_1 - N_2}{N_1 + N_2}$")
 
-# Sidebar for common inputs (Rate conversion)
 st.sidebar.header("⏱️ Rate Settings")
 use_rate = st.sidebar.checkbox("Translate Counts (N) to Time?", value=True)
 if use_rate:
     rate = st.sidebar.number_input("Total Event Rate (R1 + R2) per second", min_value=1e-3, value=100.0, format="%f")
 
-# Main mode selection
 mode = st.radio(
     "Choose your calculation mode:",
     ("Calculate Relative Uncertainty (given N and A)", "Calculate Required Counts (given A and Relative Uncertainty)")
@@ -43,7 +19,7 @@ mode = st.radio(
 st.divider()
 
 if mode == "Calculate Relative Uncertainty (given N and A)":
-    st.subheader("Compute $\\\\sigma_A / A$")
+    st.subheader("Compute $\\sigma_A / A$")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -58,7 +34,7 @@ if mode == "Calculate Relative Uncertainty (given N and A)":
         rel_uncertainty = sigma_A / A
         
         st.metric(label="Relative Uncertainty (σ_A / A)", value=f"{rel_uncertainty:.4f} ({rel_uncertainty*100:.2f}%)")
-        st.write(f"**Absolute Uncertainty (σ_A):** {sigma_A:.5f}")
+        st.markdown(f"**Absolute Uncertainty ($\\sigma_A$):** {sigma_A:.5f}")
         
         if use_rate:
             duration_sec = N / rate
@@ -85,9 +61,3 @@ else:
         else:
             time_str = f"{duration_sec/3600:.2f} hours (~{duration_sec/86400:.2f} days)"
         st.info(f"⏱️ **Required beam/run time:** {time_str}")
-`
-        }
-      }, document.getElementById("root"));
-    </script>
-  </body>
-</html>
