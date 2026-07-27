@@ -2,43 +2,83 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Asymmetry Calculator</title>
-    <!-- Use the new style.css filename -->
-    <link rel="stylesheet" href="https://jsdelivr.net" />
+    <!-- Official modern CDN assets for stlite -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.js"></script>
   </head>
   <body>
-    <div id="root"></div>
-    
-    <!-- Use type="module" to properly load the ESM script package -->
-    <script type="module">
-      import { mount } from "https://jsdelivr.net";
+    <!-- The custom element runs the embedded Python code flawlessly -->
+    <streamlit-app transparent="true">
+      <script type="text/python">
+import streamlit as st
+import numpy as np
 
-      fetch("./app.py")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.text();
-        })
-        .then((code) => {
-          // Mount directly using the imported ESM mount function
-          mount({
-            requirements: ["numpy"],
-            entrypoint: "app.py",
-            files: {
-              "app.py": code
-            }
-          }, document.getElementById("root"));
-        })
-        .catch((error) => {
-          document.getElementById("root").innerHTML = `
-            <div style="padding:20px;color:red;font-family:sans-serif;">
-              <h3>Failed to load application script</h3>
-              <p>${error.message}</p>
-            </div>`;
-        });
-    </script>
+# Page configuration
+st.set_page_config(page_title="Asymmetry Uncertainty Calculator", page_icon="📊")
+
+st.title("📊 Asymmetry Uncertainty & Time Calculator")
+st.markdown("This app calculates statistical metrics for the rate asymmetry: $A = \\frac{N_1 - N_2}{N_1 + N_2}$")
+
+# Sidebar for common inputs (Rate conversion)
+st.sidebar.header("⏱️ Rate Settings")
+use_rate = st.sidebar.checkbox("Translate Counts (N) to Time?", value=True)
+if use_rate:
+    rate = st.sidebar.number_input("Total Event Rate (R1 + R2) per second", min_value=1e-3, value=100.0, format="%f")
+
+# Main mode selection
+mode = st.radio(
+    "Choose your calculation mode:",
+    ("Calculate Relative Uncertainty (given N and A)", "Calculate Required Counts (given A and Relative Uncertainty)")
+)
+
+st.divider()
+
+if mode == "Calculate Relative Uncertainty (given N and A)":
+    st.subheader("Compute $\\sigma_A / A$")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        A = st.number_input("Asymmetry (A)", min_value=0.0, max_value=1.0, value=0.05, step=0.01, format="%f")
+    with col2:
+        N = st.number_input("Total Events (N)", min_value=1, value=10000, step=1000)
+    
+    if A == 0:
+        st.error("Asymmetry (A) cannot be exactly 0 when calculating relative uncertainty.")
+    else:
+        sigma_A = np.sqrt((1 - A**2) / N)
+        rel_uncertainty = sigma_A / A
+        
+        st.metric(label="Relative Uncertainty (σ_A / A)", value=f"{rel_uncertainty:.4f} ({rel_uncertainty*100:.2f}%)")
+        st.write(f"**Absolute Uncertainty (σ_A):** {sigma_A:.5f}")
+        
+        if use_rate:
+            duration_sec = N / rate
+            st.info(f"⏱️ **Time required to collect {N:,} events:** {duration_sec:.2f} seconds (~{duration_sec/60:.2f} minutes)")
+
+else:
+    st.subheader("Compute Required $N$")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        A = st.number_input("Expected Asymmetry (A)", min_value=1e-6, max_value=1.0, value=0.05, step=0.01, format="%f")
+    with col2:
+        target_rel = st.number_input("Target Relative Uncertainty (σ_A / A)", min_value=1e-6, value=0.02, step=0.005, format="%f")
+    
+    N_required = (1 - A**2) / (A**2 * target_rel**2)
+    N_required = int(np.ceil(N_required))
+    
+    st.metric(label="Required Total Events (N)", value=f"{N_required:,}")
+    
+    if use_rate:
+        duration_sec = N_required / rate
+        if duration_sec < 3600:
+            time_str = f"{duration_sec:.2f} seconds (~{duration_sec/60:.2f} minutes)"
+        else:
+            time_str = f"{duration_sec/3600:.2f} hours (~{duration_sec/86400:.2f} days)"
+        st.info(f"⏱️ **Required beam/run time:** {time_str}")
+      </script>
+    </streamlit-app>
   </body>
 </html>
