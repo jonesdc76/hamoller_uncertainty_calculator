@@ -4,14 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Asymmetry Calculator</title>
-    <!-- Official modern CDN assets for stlite -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.css" />
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.js"></script>
+    <!-- Stable WebAssembly application styles -->
+    <link rel="stylesheet" href="https://jsdelivr.net" />
   </head>
   <body>
-    <!-- The custom element runs the embedded Python code flawlessly -->
-    <streamlit-app transparent="true">
-      <script type="text/python">
+    <!-- Main container where the app mounts -->
+    <div id="root"></div>
+
+    <script type="module">
+      import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@1.8.1/build/stlite.js";
+
+      mount({
+        requirements: ["numpy"],
+        entrypoint: "app.py",
+        files: {
+          "app.py": `
 import streamlit as st
 import numpy as np
 
@@ -19,7 +26,7 @@ import numpy as np
 st.set_page_config(page_title="Asymmetry Uncertainty Calculator", page_icon="📊")
 
 st.title("📊 Asymmetry Uncertainty & Time Calculator")
-st.markdown("This app calculates statistical metrics for the rate asymmetry: $A = \\frac{N_1 - N_2}{N_1 + N_2}$")
+st.markdown("This app calculates statistical metrics for the rate asymmetry: $A = \\\\frac{N_1 - N_2}{N_1 + N_2}$")
 
 # Sidebar for common inputs (Rate conversion)
 st.sidebar.header("⏱️ Rate Settings")
@@ -36,7 +43,7 @@ mode = st.radio(
 st.divider()
 
 if mode == "Calculate Relative Uncertainty (given N and A)":
-    st.subheader("Compute $\\sigma_A / A$")
+    st.subheader("Compute $\\\\sigma_A / A$")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -78,7 +85,9 @@ else:
         else:
             time_str = f"{duration_sec/3600:.2f} hours (~{duration_sec/86400:.2f} days)"
         st.info(f"⏱️ **Required beam/run time:** {time_str}")
-      </script>
-    </streamlit-app>
+`
+        }
+      }, document.getElementById("root"));
+    </script>
   </body>
 </html>
