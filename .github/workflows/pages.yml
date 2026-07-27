@@ -1,8 +1,11 @@
 name: Deploy to GitHub Pages
 
+name: Deploy to GitHub Pages
+
 on:
   push:
-    branches: ["main"] # Change to "master" if your default branch is master
+    branches: ["main"] # Keeps auto-deploy on every push
+  workflow_dispatch: # <--- THIS LINE ENABLES THE MANUAL "RUN WORKFLOW" BUTTON!
 
 permissions:
   contents: read
