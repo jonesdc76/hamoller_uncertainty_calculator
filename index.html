@@ -13,7 +13,8 @@
       padding: 20px;
     }
     .container {
-      max-width: 750px;
+      /* Expanded width by 40% (from 750px to 1050px) */
+      max-width: 1050px; 
       margin: 20px auto;
       background: white;
       padding: 30px;
@@ -54,9 +55,9 @@
   <h1>📊 Asymmetry & Runtime Calculator</h1>
   <div class="subtitle">Statistical metrics for rate asymmetry measurements.</div>
   
-  <!-- Plain Text Math Formula Block -->
+  <!-- Updated equation presentation using fractional exponents -->
   <div class="math-box">
-    A = (N1 - N2) / (N1 + N2) &nbsp;&nbsp;|&nbsp;&nbsp; &sigma;<sub>A</sub> = &sqrt;((1 - A<sup>2</sup>) / N)
+    A = (N1 - N2) / (N1 + N2) &nbsp;&nbsp;|&nbsp;&nbsp; &sigma;<sub>A</sub> = ((1 - A<sup>2</sup>) / N)<sup>1/2</sup>
   </div>
 
   <div class="grid">
@@ -66,8 +67,9 @@
       
       <label for="mode">What do you want to find?</label>
       <select id="mode" onchange="toggleInputs(); calculate();">
-        <option value="uncertainty">Relative Uncertainty (&sigma;<sub>A</sub> / A) given N</option>
+        <!-- Re-ordered to place Required Counts as the primary default selection -->
         <option value="counts">Required Counts (N) given target uncertainty</option>
+        <option value="uncertainty">Relative Uncertainty (&sigma;<sub>A</sub> / A) given N</option>
       </select>
 
       <label for="rate">Total Event Rate (R1 + R2) per second</label>
@@ -81,12 +83,12 @@
       <label for="inputA">Measured/Expected Asymmetry (A)</label>
       <input type="number" id="inputA" value="0.05" min="0" max="1" step="0.01" oninput="calculate();">
 
-      <div id="groupN">
+      <div id="groupN" style="display:none;">
         <label for="inputN">Total Collected Events (N)</label>
         <input type="number" id="inputN" value="10000" min="1" step="1000" oninput="calculate();">
       </div>
 
-      <div id="groupUnc" style="display:none;">
+      <div id="groupUnc">
         <label for="inputUnc">Target Relative Uncertainty (&sigma;<sub>A</sub> / A)</label>
         <input type="number" id="inputUnc" value="0.02" min="0.000001" step="0.005" oninput="calculate();">
       </div>
