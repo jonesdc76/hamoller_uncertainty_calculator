@@ -5,16 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Asymmetry Calculator</title>
-    <!-- Upgraded to a more modern, stable build of stlite -->
+    <!-- Use the new style.css filename -->
     <link rel="stylesheet" href="https://jsdelivr.net" />
   </head>
   <body>
     <div id="root"></div>
-    <script src="https://jsdelivr.net"></script>
-    <script>
-      // Explicitly pull app.py relative to the current folder path
-      const currentPath = window.location.pathname.endsWith('/') ? window.location.pathname : window.location.pathname + '/';
-      
+    
+    <!-- Use type="module" to properly load the ESM script package -->
+    <script type="module">
+      import { mount } from "https://jsdelivr.net";
+
       fetch("./app.py")
         .then((response) => {
           if (!response.ok) {
@@ -23,7 +23,8 @@
           return response.text();
         })
         .then((code) => {
-          stlite.mount({
+          // Mount directly using the imported ESM mount function
+          mount({
             requirements: ["numpy"],
             entrypoint: "app.py",
             files: {
@@ -32,7 +33,11 @@
           }, document.getElementById("root"));
         })
         .catch((error) => {
-          document.getElementById("root").innerHTML = `<div style="padding:20px;color:red;"><h3>Failed to load application script</h3><p>${error.message}</p></div>`;
+          document.getElementById("root").innerHTML = `
+            <div style="padding:20px;color:red;font-family:sans-serif;">
+              <h3>Failed to load application script</h3>
+              <p>${error.message}</p>
+            </div>`;
         });
     </script>
   </body>
