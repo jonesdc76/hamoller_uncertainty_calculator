@@ -8,7 +8,7 @@ st.markdown("This app calculates statistical metrics for the rate asymmetry: $A 
 st.sidebar.header("⏱️ Rate Settings")
 use_rate = st.sidebar.checkbox("Translate Counts (N) to Time?", value=True)
 if use_rate:
-    rate = st.sidebar.number_input("Total Event Rate (R1 + R2) per second", min_value=1e-3, value=100.0, format="%f")
+    rate = st.sidebar.number_input("Total Coincidence Event Rate (Hz)", min_value=1e-3, value=100.0, format="%f")
 
 mode = st.radio(
     "Choose your calculation mode:",
@@ -23,12 +23,12 @@ if mode == "Calculate Relative Uncertainty (given N and A)":
     with col1:
         A = st.number_input("Asymmetry (A)", min_value=0.0, max_value=1.0, value=0.05, step=0.01, format="%f")
     with col2:
-        N = st.number_input("Total Events (N)", min_value=1, value=10000, step=1000)
+        N = st.number_input("Total Coincidence Events (N)", min_value=1, value=10000, step=1000)
     
     if A == 0:
         st.error("Asymmetry (A) cannot be 0 for relative uncertainty.")
     else:
-        sigma_A = np.sqrt((1 - A**2) / N)
+        sigma_A = np.sqrt((1 - A**2) / (2*N))
         rel_uncertainty = sigma_A / A
         st.metric(label="Relative Uncertainty (σ_A / A)", value=f"{rel_uncertainty:.4f} ({rel_uncertainty*100:.2f}%)")
         st.write(f"**Absolute Uncertainty (σ_A):** {sigma_A:.5f}")
