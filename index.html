@@ -159,8 +159,8 @@
         return;
       }
 
-      // Formula: N = (1-A^2) / (A^2 * target_rel^2)
-      const N_required = Math.ceil((1 - (A * A)) / ((A * A) * (targetRel * targetRel)));
+      // Formula: N = (1-A^2) / (2A^2 * target_rel^2)
+      const N_required = Math.ceil((1 - (A * A)) / ((2*A * A) * (targetRel * targetRel)));
       const timeRequired = N_required / rate;
 
       resultsDiv.innerHTML = `
